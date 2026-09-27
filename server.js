@@ -20,6 +20,11 @@ app.post("/shorten", (req, res) => {
     res.json({ success: true, shortUrl: `http://localhost:${PORT}/${shortCode}` });
 });
 
+// List all shortened URLs
+app.get("/urls", (req, res) => {
+    res.json({ success: true, urls: urlDatabase });
+});
+
 // Redirect from short code to original URL
 app.get("/:shortCode", (req, res) => {
     const { shortCode } = req.params;

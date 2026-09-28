@@ -1,11 +1,24 @@
 const express = require("express");
+const fs = require("fs");
+const path = require("path");
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
 
-// in-memory storage: shortCode -> original URL
-const urlDatabase = {};
+const DB_FILE = path.join(__dirname, "urls.json");
+
+function loadUrls() {
+    if (!fs.existsSync(DB_FILE)) return {};
+    return JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
+}
+
+function saveUrls(data) {
+    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+}
+
+// in-memory storage, seeded from disk on startup
+const urlDatabase = loadUrls();
 
 // Create a short URL
 app.post("/shorten", (req, res) => {

@@ -29,6 +29,7 @@ app.post("/shorten", (req, res) => {
 
     const shortCode = Math.random().toString(36).substring(2, 8);
     urlDatabase[shortCode] = url;
+        saveUrls(urlDatabase);
 
     res.json({ success: true, shortUrl: `http://localhost:${PORT}/${shortCode}` });
 });

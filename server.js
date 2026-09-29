@@ -20,6 +20,14 @@ function saveUrls(data) {
 // in-memory storage, seeded from disk on startup
 const urlDatabase = loadUrls();
 
+function generateShortCode() {
+    let code;
+    do {
+        code = Math.random().toString(36).substring(2, 8);
+    } while (urlDatabase[code]);
+    return code;
+}
+
 // Create a short URL
 app.post("/shorten", (req, res) => {
     const { url } = req.body;
@@ -27,9 +35,9 @@ app.post("/shorten", (req, res) => {
         return res.status(400).json({ success: false, message: "URL is required" });
     }
 
-    const shortCode = Math.random().toString(36).substring(2, 8);
+    const shortCode = generateShortCode();
     urlDatabase[shortCode] = url;
-        saveUrls(urlDatabase);
+    saveUrls(urlDatabase);
 
     res.json({ success: true, shortUrl: `http://localhost:${PORT}/${shortCode}` });
 });

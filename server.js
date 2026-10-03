@@ -10,7 +10,15 @@ const DB_FILE = path.join(__dirname, "urls.json");
 
 function loadUrls() {
     if (!fs.existsSync(DB_FILE)) return {};
-    return JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
+    const data = JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
+
+    // older entries were saved as plain strings; convert them to { url, clicks }
+    for (const code in data) {
+        if (typeof data[code] === "string") {
+            data[code] = { url: data[code], clicks: 0 };
+        }
+    }
+    return data;
 }
 
 function saveUrls(data) {
@@ -36,7 +44,7 @@ app.post("/shorten", (req, res) => {
     }
 
     const shortCode = generateShortCode();
-    urlDatabase[shortCode] = url;
+    urlDatabase[shortCode] = { url, clicks: 0 };
     saveUrls(urlDatabase);
 
     res.json({ success: true, shortUrl: `http://localhost:${PORT}/${shortCode}` });
@@ -50,13 +58,16 @@ app.get("/urls", (req, res) => {
 // Redirect from short code to original URL
 app.get("/:shortCode", (req, res) => {
     const { shortCode } = req.params;
-    const originalUrl = urlDatabase[shortCode];
+    const entry = urlDatabase[shortCode];
 
-    if (!originalUrl) {
+    if (!entry) {
         return res.status(404).json({ success: false, message: "Short URL not found" });
     }
 
-    res.redirect(originalUrl);
+    entry.clicks++;
+    saveUrls(urlDatabase);
+
+    res.redirect(entry.url);
 });
 
 app.listen(PORT, () => {

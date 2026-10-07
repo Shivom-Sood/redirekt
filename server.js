@@ -8,6 +8,9 @@ app.use(express.json());
 
 const DB_FILE = path.join(__dirname, "urls.json");
 
+// paths the app already uses, so they can't be custom short codes
+const RESERVED_CODES = ["urls", "shorten"];
+
 function loadUrls() {
     if (!fs.existsSync(DB_FILE)) return {};
     const data = JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
@@ -36,14 +39,45 @@ function generateShortCode() {
     return code;
 }
 
-// Create a short URL
+function isValidUrl(value) {
+    try {
+        const parsed = new URL(value);
+        return parsed.protocol === "http:" || parsed.protocol === "https:";
+    } catch {
+        return false;
+    }
+}
+
+// Create a short URL (optionally with a custom code)
 app.post("/shorten", (req, res) => {
-    const { url } = req.body;
+    const { url, customCode } = req.body;
     if (!url) {
         return res.status(400).json({ success: false, message: "URL is required" });
     }
 
-    const shortCode = generateShortCode();
+    if (!isValidUrl(url)) {
+        return res.status(400).json({ success: false, message: "Enter a valid http or https URL" });
+    }
+
+    let shortCode;
+    if (customCode) {
+        if (typeof customCode !== "string" || !/^[A-Za-z0-9_-]{3,20}$/.test(customCode)) {
+            return res.status(400).json({
+                success: false,
+                message: "Custom code must be 3-20 characters: letters, numbers, - or _"
+            });
+        }
+        if (RESERVED_CODES.includes(customCode.toLowerCase())) {
+            return res.status(400).json({ success: false, message: "That custom code is reserved" });
+        }
+        if (urlDatabase[customCode]) {
+            return res.status(409).json({ success: false, message: "That custom code is already taken" });
+        }
+        shortCode = customCode;
+    } else {
+        shortCode = generateShortCode();
+    }
+
     urlDatabase[shortCode] = { url, clicks: 0 };
     saveUrls(urlDatabase);
 
@@ -73,6 +107,3 @@ app.get("/:shortCode", (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-
-//update 
-//update 2 

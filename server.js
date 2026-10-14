@@ -13,6 +13,9 @@ const DB_FILE = path.join(__dirname, "urls.json");
 // paths the app already uses, so they can't be custom short codes
 const RESERVED_CODES = ["urls", "shorten"];
 
+// most browsers and servers don't handle URLs longer than this
+const MAX_URL_LENGTH = 2048;
+
 function loadUrls() {
     if (!fs.existsSync(DB_FILE)) return {};
     const data = JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
@@ -52,9 +55,14 @@ function isValidUrl(value) {
 
 // Create a short URL (optionally with a custom code)
 app.post("/shorten", (req, res) => {
-    const { url, customCode } = req.body;
+    const { customCode } = req.body;
+    const url = typeof req.body.url === "string" ? req.body.url.trim() : "";
     if (!url) {
         return res.status(400).json({ success: false, message: "URL is required" });
+    }
+
+    if (url.length > MAX_URL_LENGTH) {
+        return res.status(400).json({ success: false, message: `URL must be at most ${MAX_URL_LENGTH} characters` });
     }
 
     if (!isValidUrl(url)) {

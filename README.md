@@ -8,7 +8,8 @@ A small URL shortener built with Node.js and Express.
 - Optional custom short codes (3-20 characters: letters, numbers, `-` or `_`)
 - Redirect from the short link to the original URL
 - List all shortened links
-- Click count for each link
+- Click count and creation time for each link
+- Stats for a single link without following the redirect
 - Delete a short link you no longer need
 - Invalid URLs and duplicate custom codes are rejected
 - Links are saved to `urls.json`, so they survive a server restart
@@ -40,6 +41,7 @@ PORT=8080 BASE_URL=https://sho.rt npm start
 |--------|------|--------------|
 | POST | `/shorten` | Body `{ "url": "https://example.com", "customCode": "gh" }` (`customCode` is optional), returns a short URL |
 | GET | `/urls` | Lists every short code with its URL and click count |
+| GET | `/stats/:shortCode` | Shows the URL, click count and creation time for one short link |
 | GET | `/:shortCode` | Redirects to the original URL and adds 1 to its clicks |
 | DELETE | `/:shortCode` | Deletes the short link |
 

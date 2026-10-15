@@ -11,7 +11,7 @@ app.use(express.json());
 const DB_FILE = path.join(__dirname, "urls.json");
 
 // paths the app already uses, so they can't be custom short codes
-const RESERVED_CODES = ["urls", "shorten"];
+const RESERVED_CODES = ["urls", "shorten", "stats"];
 
 // most browsers and servers don't handle URLs longer than this
 const MAX_URL_LENGTH = 2048;
@@ -97,6 +97,17 @@ app.post("/shorten", (req, res) => {
 // List all shortened URLs
 app.get("/urls", (req, res) => {
     res.json({ success: true, urls: urlDatabase });
+});
+
+// Show details for one short URL without redirecting
+app.get("/stats/:shortCode", (req, res) => {
+    const entry = urlDatabase[req.params.shortCode];
+
+    if (!entry) {
+        return res.status(404).json({ success: false, message: "Short URL not found" });
+    }
+
+    res.json({ success: true, shortCode: req.params.shortCode, ...entry });
 });
 
 // Delete a short URL

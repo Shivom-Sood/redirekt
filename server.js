@@ -88,7 +88,7 @@ app.post("/shorten", (req, res) => {
         shortCode = generateShortCode();
     }
 
-    urlDatabase[shortCode] = { url, clicks: 0 };
+    urlDatabase[shortCode] = { url, clicks: 0, createdAt: new Date().toISOString() };
     saveUrls(urlDatabase);
 
     res.json({ success: true, shortUrl: `${BASE_URL}/${shortCode}` });

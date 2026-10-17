@@ -139,6 +139,15 @@ app.get("/:shortCode", (req, res) => {
     res.redirect(entry.url);
 });
 
+// Send JSON instead of an HTML error page when the request body isn't valid JSON
+app.use((err, req, res, next) => {
+    if (err.type === "entity.parse.failed") {
+        return res.status(400).json({ success: false, message: "Request body must be valid JSON" });
+    }
+    console.error(err);
+    res.status(500).json({ success: false, message: "Something went wrong" });
+});
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

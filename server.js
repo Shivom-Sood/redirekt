@@ -18,7 +18,17 @@ const MAX_URL_LENGTH = 2048;
 
 function loadUrls() {
     if (!fs.existsSync(DB_FILE)) return {};
-    const data = JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
+
+    let data;
+    try {
+        data = JSON.parse(fs.readFileSync(DB_FILE, "utf-8"));
+    } catch (err) {
+        // keep the broken file so nothing is lost, then start with an empty database
+        const backup = `${DB_FILE}.corrupt-${Date.now()}`;
+        fs.renameSync(DB_FILE, backup);
+        console.error(`Could not read ${DB_FILE} (${err.message}); moved it to ${backup}`);
+        return {};
+    }
 
     // older entries were saved as plain strings; convert them to { url, clicks }
     for (const code in data) {

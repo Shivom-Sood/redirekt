@@ -29,6 +29,7 @@ The server runs on `http://localhost:3000`.
 | Variable | Default | What it does |
 |----------|---------|--------------|
 | `PORT` | `3000` | Port the server listens on |
+| `DB_FILE` | `urls.json` next to `server.js` | File where links are saved |
 | `BASE_URL` | `http://localhost:<PORT>` | Address used when building short links (set this when deployed) |
 
 ```bash

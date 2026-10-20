@@ -8,7 +8,7 @@ const BASE_URL = (process.env.BASE_URL || `http://localhost:${PORT}`).replace(/\
 
 app.use(express.json());
 
-const DB_FILE = path.join(__dirname, "urls.json");
+const DB_FILE = process.env.DB_FILE || path.join(__dirname, "urls.json");
 
 // paths the app already uses, so they can't be custom short codes
 const RESERVED_CODES = ["urls", "shorten", "stats"];
@@ -158,6 +158,11 @@ app.use((err, req, res, next) => {
     res.status(500).json({ success: false, message: "Something went wrong" });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+// only start listening when run directly, so tests can import the app
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
+
+module.exports = app;

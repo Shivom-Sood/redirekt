@@ -36,6 +36,14 @@ The server runs on `http://localhost:3000`.
 PORT=8080 BASE_URL=https://sho.rt npm start
 ```
 
+## Tests
+
+```bash
+npm test
+```
+
+Tests use Node's built-in test runner and a temporary database, so your `urls.json` is never touched.
+
 ## Endpoints
 
 | Method | Path | What it does |

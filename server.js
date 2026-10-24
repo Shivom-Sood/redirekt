@@ -2,7 +2,9 @@ const express = require("express");
 const fs = require("fs");
 const path = require("path");
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+// public address used when building short links (set this when deployed)
+const BASE_URL = (process.env.BASE_URL || `http://localhost:${PORT}`).replace(/\/+$/, "");
 
 app.use(express.json());
 
@@ -81,7 +83,7 @@ app.post("/shorten", (req, res) => {
     urlDatabase[shortCode] = { url, clicks: 0 };
     saveUrls(urlDatabase);
 
-    res.json({ success: true, shortUrl: `http://localhost:${PORT}/${shortCode}` });
+    res.json({ success: true, shortUrl: `${BASE_URL}/${shortCode}` });
 });
 
 // List all shortened URLs
@@ -121,5 +123,3 @@ app.get("/:shortCode", (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-
-//practice123 

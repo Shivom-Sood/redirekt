@@ -17,10 +17,22 @@ A small URL shortener built with Node.js and Express.
 
 ```bash
 npm install
-npm start
+npm start      # run with node
+npm run dev    # run with nodemon (restarts on file changes)
 ```
 
 The server runs on `http://localhost:3000`.
+
+### Configuration
+
+| Variable | Default | What it does |
+|----------|---------|--------------|
+| `PORT` | `3000` | Port the server listens on |
+| `BASE_URL` | `http://localhost:<PORT>` | Address used when building short links (set this when deployed) |
+
+```bash
+PORT=8080 BASE_URL=https://sho.rt npm start
+```
 
 ## Endpoints
 

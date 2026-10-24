@@ -89,6 +89,20 @@ app.get("/urls", (req, res) => {
     res.json({ success: true, urls: urlDatabase });
 });
 
+// Delete a short URL
+app.delete("/:shortCode", (req, res) => {
+    const { shortCode } = req.params;
+
+    if (!urlDatabase[shortCode]) {
+        return res.status(404).json({ success: false, message: "Short URL not found" });
+    }
+
+    delete urlDatabase[shortCode];
+    saveUrls(urlDatabase);
+
+    res.json({ success: true, message: "Short URL deleted" });
+});
+
 // Redirect from short code to original URL
 app.get("/:shortCode", (req, res) => {
     const { shortCode } = req.params;
